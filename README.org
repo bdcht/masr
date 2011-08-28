@@ -58,7 +58,7 @@ D-bus and control the entire app :
   #+END_EXAMPLE
 
 
-* =masr.py= : contains the main class
+* =masr/main.py= : contains the main class
    - Masr
 
 *** Masr.
@@ -76,7 +76,7 @@ The default usage is:
 The init of Masr instance will setup the gtk window, GUI elements, and the
 crcanvas widget. (The graph plugin is loaded by default.)
 
-** =window.py= : contains the gtk window class
+** =masr/window.py= : contains the gtk window class
    - Window
    - gtkWindow(Window)
 
@@ -88,11 +88,12 @@ called later in the mainloop only. The mainLoop() method is called by
 Masr.run() to handle all events on widgets by starting the main gtk event loop.
 Event handlers are supposed to be set up in start() or during plugins init.
 
-** =gui.py= : contains the menubar and statusbar gtk widget definition.
+** =masr/gui.py= : contains the menubar and statusbar gtk widget definition.
    - gtkgui
 
-** =canvas.py= : contains the crcanvas wrapper. The current underlying canvas
-is 'crcanvas' (http://), but other implementation may be used (goocanvas, etc).
+** =masr/canvas.py= : contains the crcanvas wrapper. The current underlying canvas
+is [[http://geocanvas.sourceforge.net/crcanvas][crcanvas]], but a branch based on
+   [[http://live.gnome.org/GooCanvas][goocanvas]] is planned.
    - CrCanvas
 
 *** CrCanvas
@@ -100,13 +101,13 @@ The canvas region is setup as an infinite scrolling area. It is equiped with a
 'Panner' allowing to navigate with mouse movements, and a 'Zoomer' providing
 canvas scaling (with default factor limits x0.0125 and x16).
 
-** =serv.py= : contains the dbus 'server' socket and associated methods.
+** =masr/serv.py= : contains the dbus 'server' socket and associated methods.
 
-** =masr_cli.py= : contains the dbus 'client' python interactive console.
+** =masrdbc= : contains the dbus 'client' python interactive console.
 
-** =plugins/utils.py :
+** =masr/plugins/utils.py :
 
-** =plugins/graph/ :
+** =masr/plugins/graph/ :
 See plugins/graph/README.
 
 
