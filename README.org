@@ -1,0 +1,112 @@
+#+TITLE: Masr-"a simple gtk/cairo canvas gui"
+#+AUTHOR: Axel Tillequin
+#+DATE: 2011-26-08
+#+EMAIL: bdcht3@gmail.com
+#+DESCRIPTION:
+#+KEYWORDS:
+#+LANGUAGE: en
+#+OPTIONS: H:3 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS: TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+EXPORT_EXCLUDE_TAGS: exclude
+#+STARTUP: showall
+
+ | Status:   | Under Development                    |
+ | Location: | http://github.com/bdcht/masr         |
+ | Version:  | 0.1                                  |
+
+masr - 0.1
+
+* Description
+
+masr is a gtk cairo framework based on
+  [[http://geocanvas.sourceforge.net/crcanvas][crcanvas]].
+It provides a GUI application template class (Masr) with:
+  - a menu bar
+  - the main drawing canvas (a crcanvas widget)
+  - a status bar
+  - a dbus server
+It provides also a dbus-based python client that allows a complete remote
+control of the Masr application instance. New features can be developed as
+plugins.
+
+masr was developed initially for drawing graphs with the
+[[http://github.com/bdcht/grandalf][grandalf]] framework.
+The code dedicated to graph drawing is found in the plugins/graph directory.
+Coordinates of nodes and edge routing points are computed by grandalf and
+node/edge views (gtk widgets on the canvas) are managed by the plugin.
+
+* Quickstart
+
+The "raw naked" Masr template class provides a window equiped with some gtk
+widgets (menu,statusbar,crcanvas,etc). Simply do:
+   #+BEGIN_EXAMPLE
+   >>> from masr import Masr
+   >>> a = Masr()
+   >>> a.run()
+  #+END_EXAMPLE
+Then we can use the masrdbc script to "connect" to the Masr instance through
+D-bus and control the entire app :
+   #+BEGIN_EXAMPLE
+   $ masrdbc
+   Welcome to masr d-bus client.
+   you are connected to the running Masr() instance: app = <masr.main.Masr ...
+
+   >>> app.screen
+   <masr.window.gtkWindow object at 0x8d6f20c>
+   >>> app.screen.canvas
+   <Canvas object at 0x8d7175c (CrCanvas at 0x8df6040)>
+  #+END_EXAMPLE
+
+
+* =masr.py= : contains the main class
+   - Masr
+
+*** Masr.
+This class is the base template for any GUI application. The main class may
+inherit from Masr, and redefine the 'start' and 'end' or 'step' methods.
+   - start() is called just before entering the GUI mainloop, so its a good
+    place to put everything needed to setup the scene,
+   - step() is called inside the mainloop,
+   - end() is called after the mainloop to clean up everything.
+The run() method of Masr will also setup all loaded plugins (modules).
+Such plugin is loaded if it appears in the Masr.plugins list.
+The default usage is:
+   >>> a=Masr()
+   >>> a.run()
+The init of Masr instance will setup the gtk window, GUI elements, and the
+crcanvas widget. (The graph plugin is loaded by default.)
+
+** =window.py= : contains the gtk window class
+   - Window
+   - gtkWindow(Window)
+
+*** gtkWindow.
+The initWindow creates gtk objects Window, adds a VBox widget in it, creates
+the GUI elements (menubar, VPaned widget and statusbar), and finally the canvas
+(in a ScrolledWindow widget) is added to the VPaned. The show_all() method is
+called later in the mainloop only. The mainLoop() method is called by
+Masr.run() to handle all events on widgets by starting the main gtk event loop.
+Event handlers are supposed to be set up in start() or during plugins init.
+
+** =gui.py= : contains the menubar and statusbar gtk widget definition.
+   - gtkgui
+
+** =canvas.py= : contains the crcanvas wrapper. The current underlying canvas
+is 'crcanvas' (http://), but other implementation may be used (goocanvas, etc).
+   - CrCanvas
+
+*** CrCanvas
+The canvas region is setup as an infinite scrolling area. It is equiped with a
+'Panner' allowing to navigate with mouse movements, and a 'Zoomer' providing
+canvas scaling (with default factor limits x0.0125 and x16).
+
+** =serv.py= : contains the dbus 'server' socket and associated methods.
+
+** =masr_cli.py= : contains the dbus 'client' python interactive console.
+
+** =plugins/utils.py :
+
+** =plugins/graph/ :
+See plugins/graph/README.
+
+
