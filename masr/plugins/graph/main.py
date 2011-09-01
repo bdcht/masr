@@ -74,7 +74,7 @@ def ast2Graph(ast):
     v1 = V[edot.n1.name]
     v2 = V[edot.n2.name]
     e = Edge(v1,v2)
-    e.view = Edge_curve(v1.view,v2.view,head=True)
+    e.view = Edge_basic(v1.view,v2.view,head=True)
     e.view.props.line_width = 2
     E.append(e)
   return Graph(V.values(),E)
@@ -91,7 +91,7 @@ class Node(Node_codeblock):
     self.o = o
     label = o.data
     Node_codeblock.__init__(self,label.replace('\l','\n'))
-    self.codebox.props.fill_color = 'blue'
+    #self.codebox.props.fill_color = 'blue'
     self.w,self.h = self.get_wh()
 
   def get_xy(self):
@@ -113,16 +113,13 @@ class CGraph(SugiyamaLayout):
     self.parent = c
     #c.root.add(self)
     SugiyamaLayout.__init__(self,g)
-    self.route_edge = route_with_splines
+    self.route_edge = route_with_lines
     self.xspace,self.yspace = median_wh([v.view for v in g.V()])
 
   def Draw(self,N=1):
     gr = self.g
     r = filter(lambda x: len(x.e_in())==0, gr.sV)
     print "%d verts, %d root(s)"%(gr.order(),len(r))
-    if len(r)==0:
-      print 'no root found! default root is initial node.'
-      r  = [gr.sV.o[0]]
     print 'using tarjan algorithm to find inverted_edges...'
     L = gr.get_scs_with_feedback(r)
     self.init_all(roots=r,inverted_edges=filter(lambda x:x.feedback, gr.sE))
