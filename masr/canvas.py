@@ -27,7 +27,14 @@ class  Canvas(GooCanvas):
         self.zoom = False
         self.pan  = False
         self._grid = None
+        self.grid()
 
+        # GooCanvas will transmit all keyboard events to
+        # its parent unless one of its item has focus.
+        self.parent.connect_object("key_press_event",
+                                   Canvas.eventhandler,self)
+        self.parent.connect_object("key_release_event",
+                                   Canvas.eventhandler,self)
         self.connect("event",Canvas.eventhandler)
 
     def eventhandler(self,e):
@@ -58,15 +65,16 @@ class  Canvas(GooCanvas):
             return True
         elif e.type == gtk.gdk.BUTTON_PRESS:
             print "click:(%d,%d)"%e.get_coords()
-            self.grab_focus(self.root)
         return False
 
-    def grid(self,dx=10,dy=10):
+    def grid(self,dx=100,dy=100):
         if self._grid:
             pass
         else:
             self._grid=Grid(parent=self.root,
-                    x=0,y=0,width=2000,height=2000,x_step=100,y_step=100,
+                    x=0,y=0,width=2000,height=2000,
+                    x_step=dx,y_step=dy,
+                    line_width=1,
                     stroke_color='gray88')
 
 

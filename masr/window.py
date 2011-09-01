@@ -67,8 +67,10 @@ class gtkWindow(Window):
         ## always show h,v scroll bars
         scrolled_window.set_policy(gtk.POLICY_ALWAYS, gtk.POLICY_ALWAYS)
         # create canvas object which holds the layout:
-        self.canvas = Canvas()
-        scrolled_window.add(self.canvas)
+        self.canvas = Canvas(parent=scrolled_window)
+        #scrolled_window.add(self.canvas)
+        #scrolled_window.connect_object("key_press_event",
+        #        kbdhandler,self.canvas)
         # add it to vpan widget:
         if not self.vpan:
             self.vpan = gtk.VPaned()
