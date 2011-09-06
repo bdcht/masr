@@ -5,6 +5,7 @@
 
 from  goocanvas import Canvas as GooCanvas
 from  goocanvas import polyline_new_line,Grid
+from  goocanvas import ITEM_VISIBLE,ITEM_INVISIBLE
 import gtk
 
 #------------------------------------------------------------------------------
@@ -27,7 +28,8 @@ class  Canvas(GooCanvas):
         self.zoom = False
         self.pan  = False
         self._grid = None
-        self.grid()
+        if args.has_key('grid'):
+            self.grid(*(args['grid']))
 
         # GooCanvas will transmit all keyboard events to
         # its parent unless one of its item has focus.
@@ -69,7 +71,10 @@ class  Canvas(GooCanvas):
 
     def grid(self,dx=100,dy=100):
         if self._grid:
-            pass
+            if self._grid.is_visible():
+                self._grid.props.visibility = ITEM_VISIBLE
+            else:
+                self._grid.props.visibility = ITEM_INVISIBLE
         else:
             self._grid=Grid(parent=self.root,
                     x=0,y=0,width=2000,height=2000,
