@@ -91,7 +91,6 @@ class Node(Node_codeblock):
     self.o = o
     label = o.data
     Node_codeblock.__init__(self,label.replace('\l','\n'))
-    #self.codebox.props.fill_color = 'blue'
     self.w,self.h = self.get_wh()
 
   def get_xy(self):
@@ -135,7 +134,6 @@ class CGraph(SugiyamaLayout):
 
   def connect_add(self,item):
     item.connect_object_after("event",CGraph.eventhandler,self,item)
-    item.code.props.visible = False
     self.parent.root.add(item)
     # Blit case do: self.add(item)
 
