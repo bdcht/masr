@@ -7,7 +7,8 @@ setup(
     version = '0.1',
     packages=['masr',
               'masr/plugins',
-              'masr/plugins/graph'],
+              'masr/plugins/graph',
+              'masr/plugins/ida'],
     # Metadata
     author = 'Axel Tillequin',
     author_email = 'bdcht3@gmail.com',

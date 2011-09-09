@@ -7,8 +7,10 @@ import sys
 
 from masr import Masr
 import masr.plugins.graph as graph
+import masr.plugins.ida as ida
 
 
 app=Masr()
 app.plugins.add(graph)
+app.plugins.add(ida)
 app.run(args=sys.argv)
