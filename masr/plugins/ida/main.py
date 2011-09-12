@@ -13,7 +13,13 @@ import gobject
 from grandalf.graphs import Vertex,Edge,Graph
 from grandalf.layouts import SugiyamaLayout,DigcoLayout
 from grandalf.routing import *
-from grandalf.utils import median_wh,IDA
+from grandalf.utils import median_wh
+try:
+    from grandalf.utils import IDA
+except ImportError:
+    print 'the IDA plugin requires grandalf IDA support.'
+    print 'Checkout the ida branch of grandalf and try again!'
+    raise ImportError
 
 from masr.plugins.graph.items import *
 

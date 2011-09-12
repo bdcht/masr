@@ -25,22 +25,28 @@ def start(pfunc,app,**kargs):
     al = kargs['args']
     sg = comp = 0
     gclass = CGraph
+    N = None
     for i,arg in enumerate(al):
         if arg.endswith(Session.filetype):
             if not app.session:
                 app.session = Session(arg,app)
-        if arg == '-sg':
+        elif arg == '-sg':
             sg = int(al[i+1])
-        if arg == '-c':
+        elif arg == '-c':
             comp = int(al[i+1])
-        if arg == '-digco':
+        elif arg == '-digco':
             gclass = DGraph
+        elif arg == '-N':
+            N = int(al[i+1])
     if app.session:
         assert sg<len(app.session.L)
         app.session.g = ast2Graph(app.session.L[sg])
         assert comp<len(app.session.g.C)
         app.session.cg = gclass(app.screen.canvas,app.session.g.C[comp])
-        app.session.cg.Draw()
+        if N>0:
+            app.session.cg.Draw(N)
+        else:
+            app.session.cg.Draw()
 
 def end(pfunc,app,**kargs):
     pass
@@ -167,9 +173,10 @@ class CGraph(SugiyamaLayout):
             if e.keyval == ord(' '):
                 try:
                     mvmt=self.drawer.next()
-                    for x in mvmt:
-                        if hasattr(x.view,'shadbox'):
-                            x.view.shadbox.props.fill_color='green'
+                    if mvmt!=None:
+                        for x in mvmt:
+                            if hasattr(x.view,'shadbox'):
+                                x.view.shadbox.props.fill_color='green'
                 except AttributeError:
                     self.drawer=self.draw_step()
 
@@ -224,8 +231,11 @@ class DGraph(DigcoLayout):
             if e.keyval == ord(' '):
                 try:
                     mvmt=self.drawer.next()
-                    for x in mvmt:
-                        if hasattr(x.view,'shadbox'):
-                            x.view.shadbox.props.fill_color='green'
+                    if mvmt!=None:
+                        for x in mvmt:
+                            if hasattr(x.view,'shadbox'):
+                                x.view.shadbox.props.fill_color='green'
+                    else:
+                        self.app.screen.gui.message("drawer terminated")
                 except AttributeError:
                     self.drawer=self.draw_step()
