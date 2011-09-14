@@ -87,7 +87,7 @@ def ast2Graph(ast):
         e.view = Edge_basic(v1.view,v2.view,head=ast.direct)
         e.view.props.line_width = 2
         E.append(e)
-    return Graph(V.values(),E)
+    return Graph(V.values(),E,directed=ast.direct)
 
 def dotnode(seq):
     _start = Vertex(seq)
