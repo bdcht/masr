@@ -20,20 +20,23 @@ masr - 0.1
 
 masr is a gtk cairo framework based on
   [[http://geocanvas.sourceforge.net/crcanvas][crcanvas]].
-It provides a GUI application template class (Masr) with:
+It provides a GUI application template class (=Masr=) equiped with:
   - a menu bar
   - the main drawing canvas (a crcanvas widget)
   - a status bar
   - a dbus server
-It provides also a dbus-based python client that allows a complete remote
-control of the Masr application instance. New features can be developed as
-plugins.
+A dbus-based python client allows a complete remote control of the Masr
+application instance. New features can be developed as plugins.
 
-masr was developed initially for drawing graphs with the
+This code was developed initially for drawing graphs with the
 [[http://github.com/bdcht/grandalf][grandalf]] framework.
-The code dedicated to graph drawing is found in the plugins/graph directory.
+The part dedicated to graph drawing is found in the plugins/graph directory.
 Coordinates of nodes and edge routing points are computed by grandalf and
-node/edge views (gtk widgets on the canvas) are managed by the plugin.
+node/edge views (gtk widgets on the canvas) are managed by the plugin which
+decides how to interact with these elements.
+
+The "ida" plugin uses special features found in the ida branch of grandalf to
+parse temporary files created by IDA-Pro and normally passed to wingraph.exe.
 
 * Quickstart
 
@@ -55,7 +58,7 @@ D-bus and control the entire app :
    <masr.window.gtkWindow object at 0x8d6f20c>
    >>> app.screen.canvas
    <Canvas object at 0x8d7175c (CrCanvas at 0x8df6040)>
-  #+END_EXAMPLE
+   #+END_EXAMPLE
 
 
 * =masr/main.py= : contains the main class
