@@ -17,8 +17,7 @@ from goocanvas import *
 class CX(Rect):
     def __init__(self,e=None):
         Rect.__init__(self,width=3,height=3)
-        self.props.line_width=1
-        self.props.fill_color='red'
+        self.set_properties(line_width=1,fill_color='red')
         #self.props.visible=False
         # list of edges connected to this CX:
         self.registered = []
@@ -26,10 +25,9 @@ class CX(Rect):
         #self.connect('event',CX.eventhandler)
 
     def set_wh(self,wh):
-        self.props.width = wh[0]
-        self.props.height = wh[1]
+        self.set_properties(width = wh[0], height = wh[1])
     def get_wh(self):
-        return (self.props.width,self.props.height)
+        return self.get_properties('width','height')
     wh = property(get_wh,set_wh)
 
     # manage Edge_basic that are using this CX:
@@ -68,7 +66,7 @@ class Node_basic(Group):
     #prop:
     def set_r(self,r):
         self._r = r
-        self.props.width = self.props.height = 2*r
+        self.el.set_properties(radius_x = r, radius_y = r)
     def get_r(self):
         return self._r
     r = property(get_r,set_r)
@@ -100,9 +98,9 @@ class Node_basic(Group):
     def __init__(self,r=10):
         Group.__init__(self)
         self.el = Ellipse(parent=self,
-                          fill_color='white',
+                          fill_color='gray88',
                           stroke_color='black',
-                          line_width=1)
+                          line_width=2)
         # extra:
         self.alpha = 1.
         self.r = r
@@ -111,7 +109,7 @@ class Node_basic(Group):
                           font="monospace, bold, 8",
                           fill_color='blue',
                           anchor=gtk.ANCHOR_CENTER)
-        self.label.props.visibility = False
+        #self.label.props.visibility = False
         # edges connectors:
         self.cx = []
         # events:

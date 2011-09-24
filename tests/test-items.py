@@ -6,21 +6,29 @@
 from masr import Masr
 from masr.plugins.graph.items import *
 
-class App(Masr):
-    def start(self):
-        # test drawing on canvas:
-        n1 = Node_basic(r=50)
-        #n1.props.x,n1.props.y=51,51
-        self.screen.canvas.root.add_child(n1)
-        #n2 = Node_codeblock("0x0804843c 'f3a4'    rep movsb dword [esp+0x4],0x3\n"
-        #                   "0x0804835e '8945fc'  mov [ebp-0x4],eax")
-        #n2.props.x,n2.props.y=351,51
-        #self.screen.canvas.root.add_child(n2)
-        #e = Edge_basic(n1,n2,head=True)
-        #self.screen.canvas.root.add_child(e)
-        #e = Edge_curve(n1,n2)
-        #e.props.stroke_color='DarkGreen'
-        #self.screen.canvas.root.add_child(e)
-        #e.update_points()
+def scene(app):
+    # test drawing on canvas:
+    print 'make ellipse'
+    el = Ellipse(parent=app.screen.canvas.root,
+                 center_x=400,center_y=200,
+                 radius_x=50,radius_y=40,
+                 fill_color='gray88',
+                 stroke_color='red',
+                 line_width=2)
+    # use items:
+    n1 = Node_basic(r=50)
+    n1.set_properties(x=151,y=151)
+    app.screen.canvas.root.add_child(n1)
+    #n2 = Node_codeblock("0x0804843c 'f3a4'    rep movsb dword [esp+0x4],0x3\n"
+    #                   "0x0804835e '8945fc'  mov [ebp-0x4],eax")
+    #n2.props.x,n2.props.y=351,51
+    #self.screen.canvas.root.add_child(n2)
+    #e = Edge_basic(n1,n2,head=True)
+    #self.screen.canvas.root.add_child(e)
+    #e = Edge_curve(n1,n2)
+    #e.props.stroke_color='DarkGreen'
+    #self.screen.canvas.root.add_child(e)
+    #e.update_points()
 
-App().run()
+app=Masr()
+app.run(start=scene)

@@ -50,7 +50,7 @@ class Masr(object):
         from serv import MasrServ
         serv = MasrServ(self.__dict__)
         # main loop with start/end hooks :
-        self.start()
+        self.start(kargs.get('start',None))
         self.screen.mainLoop()
         self.end()
 

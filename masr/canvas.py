@@ -21,9 +21,10 @@ class  Canvas(GooCanvas):
         self.props.automatic_bounds=True
 
         self.root = self.get_root_item()
+        self.root.set_properties(fill_color='white')
 
-        polyline_new_line(self.root,-5,0,5,0,stroke_color='gray66')
-        polyline_new_line(self.root,0,-5,0,5,stroke_color='gray66')
+        polyline_new_line(self.root,-5,0,5,0,stroke_color='red')
+        polyline_new_line(self.root,0,-5,0,5,stroke_color='red')
 
         self.zoom = False
         self.pan  = False
@@ -45,6 +46,8 @@ class  Canvas(GooCanvas):
             kvn = gtk.gdk.keyval_name(e.keyval)
             if kvn == 'a':
                 self.scroll_to(0,0)
+            #elif kvn=='g':
+            #    self.grid()
             if kvn == 'Control_L':
                 if not self.zoom:
                     print 'zoom on'
@@ -70,17 +73,17 @@ class  Canvas(GooCanvas):
         return False
 
     def grid(self,dx=100,dy=100):
-        if self._grid:
+        if self._grid!=None:
             if self._grid.is_visible():
-                self._grid.props.visibility = ITEM_VISIBLE
-            else:
                 self._grid.props.visibility = ITEM_INVISIBLE
+            else:
+                self._grid.props.visibility = ITEM_VISIBLE
         else:
             self._grid=Grid(parent=self.root,
                     x=0,y=0,width=2000,height=2000,
                     x_step=dx,y_step=dy,
                     line_width=1,
-                    stroke_color='gray88')
+                    stroke_color='gray66')
 
 
     # textures are shared by all engine objects with a classmethod :
