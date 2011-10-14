@@ -221,26 +221,30 @@ class Node_codeblock(Group):
 
     def __init__(self,code):
         Group.__init__(self)
-        self.codebox = Rect(can_focus=True)
-        self.code = Text(text=code,font='monospace, 8',anchor=gtk.ANCHOR_CENTER)
-        self.add_child(self.codebox)
-        self.add_child(self.code)
+        self.codebox = Rect(parent=self,can_focus=True)
+        self.code = Text(parent=self,
+                         text=code,
+                         font='monospace, 10',
+                         fill_color='black')
         self.padding = 4
-        bb = Bounds()
-        bb = self.code.get_bounds()
-        w  = (bb.x2-bb.x1)+self.padding
-        h  = (bb.y2-bb.y1)+self.padding
+        bbink,bblogic = self.code.get_natural_extents()
+        w  = (bblogic[2]*0.001)+2*self.padding
+        h  = (bblogic[3]*0.001)+2*self.padding
         self.codebox.set_properties(width=w,height=h)
-        self.codebox.props.fill_color = 'white'
-        self.codebox.props.stroke_color = 'black'
-        self.codebox.props.line_width = 1.0
+        self.codebox.set_properties(fill_color='white',
+                                    stroke_color='black',
+                                    line_width=1)
+        self.code.raise_(self.codebox)
         # shadow :
-        self.shadow = s = 3
+        self.shadow = s = 2
         self.codebox.set_properties(x=-s,y=-s)
-        self.shadbox = Rect(x=s,y=s,width=w,height=h,fill_color='grey44')
+        self.code.set_properties(x=-s+self.padding,y=-s+self.padding)
+        self.shadbox = Rect(x=s,y=s,width=w,height=h,
+                            fill_color='grey44',
+                            line_width=0)
         self._wh = (w+s+s,h+s+s)
         self.cx = []
-        self.add_child(self.shadbox)
+        self.add_child(self.shadbox,0)
         self.shadbox.lower(self.codebox)
         # events:
         self.clicked=0
@@ -285,7 +289,7 @@ class Node_codeblock(Group):
                     }
         lre = re.compile("(0x[0-9a-f]+ )('[0-9a-f]+' +)(.*)$")
         hcode = []
-        for l in self.code.props.text.splitlines():
+        for l in self.code.get_properties('text').splitlines():
             if l.startswith('#'):
                 hcode.append(style['comm']%l)
             else:
@@ -296,25 +300,25 @@ class Node_codeblock(Group):
                 s += [style['strg']%g[1]]
                 s += [style['code']%g[2]]
                 hcode.append(''.join(s))
-        self.code.set_property(text='\n'.join(hcode))
-        self.code.set_property(use_markup=True)
+        self.code.set_properties(text='\n'.join(hcode))
+        self.code.set_properties(use_markup=True)
 
     def highlight_off(self):
         import re
         lre = re.compile("<span [^>]+>(.*?)</span>")
         code = []
-        for l in self.code.props.text.splitlines():
+        for l in self.code.get_properties('text').splitlines():
             g = lre.findall(l)
             if len(g)>0: code.append(''.join(g))
-        self.code.set_property(text='\n'.join(code))
-        self.code.set_property(use_markup=False)
+        self.code.set_properties(text='\n'.join(code))
+        self.code.set_properties(use_markup=False)
 
     @mouse1moves
     def eventhandler(self,item,e):
         if e.type is gtk.gdk.ENTER_NOTIFY:
-            self.codebox.props.line_width=2.0
+            self.codebox.set_properties(line_width=2.0)
         elif e.type is gtk.gdk.LEAVE_NOTIFY:
-            self.codebox.props.line_width=1.0
+            self.codebox.set_properties(line_width=1.0)
         return False
 
     def notifyhandler(self,prop):

@@ -17,13 +17,14 @@ def scene(app):
                  line_width=2)
     # use items:
     n1 = Node_basic(r=50)
+    n1.label.set_properties(text="TOTO")
     n1.set_properties(x=151,y=151)
     app.screen.canvas.root.add_child(n1)
-    #n2 = Node_codeblock("0x0804843c 'f3a4'    rep movsb dword [esp+0x4],0x3\n"
-    #                   "0x0804835e '8945fc'  mov [ebp-0x4],eax")
-    #n2.props.x,n2.props.y=351,51
-    #self.screen.canvas.root.add_child(n2)
-    #e = Edge_basic(n1,n2,head=True)
+    n2 = Node_codeblock("0x0804843c 'f3a4'    rep movsb dword [esp+0x4],0x3\n"
+                        "0x0804835e '8945fc'  mov [ebp-0x4],eax")
+    n2.set_properties(x=351,y=51)
+    app.screen.canvas.root.add_child(n2)
+    #e = Edge_basic(n1,n2,head=False)
     #self.screen.canvas.root.add_child(e)
     #e = Edge_curve(n1,n2)
     #e.props.stroke_color='DarkGreen'
