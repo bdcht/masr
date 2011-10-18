@@ -24,8 +24,8 @@ def scene(app):
                         "0x0804835e '8945fc'  mov [ebp-0x4],eax")
     n2.set_properties(x=351,y=51)
     app.screen.canvas.root.add_child(n2)
-    #e = Edge_basic(n1,n2,head=False)
-    #self.screen.canvas.root.add_child(e)
+    e = Edge_basic(n1,n2,head=False)
+    app.screen.canvas.root.add_child(e)
     #e = Edge_curve(n1,n2)
     #e.props.stroke_color='DarkGreen'
     #self.screen.canvas.root.add_child(e)

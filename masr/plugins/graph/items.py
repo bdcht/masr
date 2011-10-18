@@ -17,8 +17,8 @@ from goocanvas import *
 class CX(Rect):
     def __init__(self,e=None):
         Rect.__init__(self,width=3,height=3)
-        self.set_properties(line_width=1,fill_color='red')
-        #self.props.visible=False
+        self.set_properties(line_width=0,fill_color='red')
+        #self.props.visibility=False
         # list of edges connected to this CX:
         self.registered = []
         if e!=None: self.register(e)
@@ -29,6 +29,10 @@ class CX(Rect):
     def get_wh(self):
         return self.get_properties('width','height')
     wh = property(get_wh,set_wh)
+
+    def getpos(self):
+        bb = self.get_bounds()
+        return (bb.x1,bb.y1)
 
     # manage Edge_basic that are using this CX:
     def register(self,item):
@@ -44,19 +48,21 @@ class CX(Rect):
 # button id, and moves the object along with mouse-1 movements.
 def mouse1moves(h):
     def wrapper(self,item,e):
-        self.last_msec = [0]
+        #self.last_msec = [0]
         if e.type is gtk.gdk.BUTTON_PRESS:
             self.clicked = e.button
             self.oldx,self.oldy = e.get_coords()
-            self.last_msec[0] = 0.
+            #self.last_msec[0] = 0.
         elif e.type is gtk.gdk.BUTTON_RELEASE:
             self.clicked = 0
         elif e.type is gtk.gdk.MOTION_NOTIFY:
-            if abs(e.time - self.last_msec[0])<10: return False
-            self.last_msec[0]=e.time
+            #if abs(e.time - self.last_msec[0])<10: return False
+            #self.last_msec[0]=e.time
             if self.clicked==1:
                 newx,newy = e.get_coords()
-                self.translate(newx-self.oldx, newy-self.oldy)
+                tx,ty = newx-self.oldx,newy-self.oldy
+                self.translate(tx,ty)
+                self.notify('transform')
         return h(self,item,e)
     return wrapper
 
@@ -81,11 +87,16 @@ class Node_basic(Group):
     # and the radius from centre to pt 'topt'. 
     def intersect(self,topt,cx):
         assert self.find_child(cx)!=-1
+        #get cx pos on canvas:
+        r = self.get_canvas()
         x1,y1 = self.props.x,self.props.y
+        x1,y1 = r.convert_from_item_space(self,x1,y1)
+        # intersect with target pt:
         x2,y2 = topt
         theta = math.atan2(y2-y1,x2-x1)
-        cx.props.x = int(math.cos(theta)*self._r)
-        cx.props.y = int(math.sin(theta)*self._r)
+        newx = int(math.cos(theta)*self._r)
+        newy = int(math.sin(theta)*self._r)
+        cx.set_properties(x=newx,y=newy)
         self._angle = theta
 
     def set_alpha(self,a):
@@ -120,6 +131,7 @@ class Node_basic(Group):
         self.connect("motion-notify-event",Node_basic.eventhandler)
         # clicked: 1=mouse1, 2=mouse2, 3=mouse3
         self.clicked=0
+        self.connect('notify::transform',Node_basic.notifyhandler)
 
     @mouse1moves
     def eventhandler(self,item,e):
@@ -131,21 +143,23 @@ class Node_basic(Group):
 
     def notifyhandler(self,prop):
         #print "notify %s on "%prop.name,self
-        if prop.name in ('matrix','x','y'):
-            for cx in self.cx:
-                for e in cx.registered: e.update_points()
+        for cx in self.cx:
+            for e in cx.registered: e.update_points()
 
 #------------------------------------------------------------------------------
 class Edge_basic(Polyline):
     def __init__(self,n0,n1,head=False):
         self.n = [n0,n1]
+        x0,y0 = n0.props.x,n0.props.y
+        x1,y1 = n1.props.x,n1.props.y
         self.cx = [CX(self),CX(self)]
         n0.cx.append(self.cx[0]); n0.add_child(self.cx[0])
         n1.cx.append(self.cx[1]); n1.add_child(self.cx[1])
-        Polyline.__init__(self,points=Points([(0,0),(1,1)]))
+        Polyline.__init__(self,points=Points([(x0,y0),(x1,y1)]))
         self.set_properties(close_path=False,
                             stroke_color='black',
-                            line_width=1)
+                            end_arrow=True,
+                            line_width=2)
         if head:
             self.set_properties(end_arrow=True)
         self.update_points()
@@ -159,9 +173,9 @@ class Edge_basic(Polyline):
         self.n[0].intersect(topt=pts[1],cx=self.cx[0])
         self.n[1].intersect(topt=pts[-2],cx=self.cx[-1])
         self.cx[-1].props.fill_color='blue'
-        cx = (self.cx[0].props.x,self.cx[0].props.y)
+        cx = self.cx[0].getpos()
         pts[0] = cx
-        cx = (self.cx[-1].props.x,self.cx[-1].props.y)
+        cx = self.cx[-1].getpos()
         pts[-1] =  cx
         self.props.points = Points(pts)
 
@@ -225,6 +239,7 @@ class Node_codeblock(Group):
         self.code = Text(parent=self,
                          text=code,
                          font='monospace, 10',
+                         use_markup=True,
                          fill_color='black')
         self.padding = 4
         bbink,bblogic = self.code.get_natural_extents()
@@ -253,6 +268,7 @@ class Node_codeblock(Group):
         self.connect("button-press-event",Node_codeblock.eventhandler)
         self.connect("button-release-event",Node_codeblock.eventhandler)
         self.connect("motion-notify-event",Node_codeblock.eventhandler)
+        self.connect('notify::transform',Node_codeblock.notifyhandler)
 
     def set_wh(self,wh): pass
     def get_wh(self):
@@ -261,20 +277,19 @@ class Node_codeblock(Group):
 
     def intersect(self,topt,cx):
         assert self.find_child(cx)!=-1
-        x1,y1 = 0,0
-        x2,y2 = topt[0]-self.props.x,topt[1]-self.props.y
-        bb = self.codebox.get_bounds()
+        bb = self.get_bounds()
+        w,h = self.codebox.get_properties('width','height')
+        x1,y1 = w/2,h/2
+        x2,y2 = topt[0]-bb.x1,topt[1]-bb.y1
         # now try all 4 segments of self rectangle:
-        S = [((x1,y1),(x2,y2),(bb.x1,bb.y1),(bb.x2,bb.y1)),
-             ((x1,y1),(x2,y2),(bb.x2,bb.y1),(bb.x2,bb.y2)),
-             ((x1,y1),(x2,y2),(bb.x1,bb.y2),(bb.x2,bb.y2)),
-             ((x1,y1),(x2,y2),(bb.x1,bb.y2),(bb.x1,bb.y1))]
+        S = [((x1,y1),(x2,y2),(0,0),(w,0)),
+             ((x1,y1),(x2,y2),(w,0),(w,h)),
+             ((x1,y1),(x2,y2),(0,h),(w,h)),
+             ((x1,y1),(x2,y2),(0,h),(0,0))]
         for segs in S:
             xy = intersect2lines(*segs)
             if xy!=None:
-                x,y = xy
-                cx.props.x = x+self.codebox.props.x
-                cx.props.y = y+self.codebox.props.y
+                cx.set_properties(x=xy[0]-self.shadow,y=xy[1]-self.shadow)
                 break
 
     def highlight_on(self,style=None):
@@ -323,9 +338,8 @@ class Node_codeblock(Group):
 
     def notifyhandler(self,prop):
         #print "notify %s on "%prop.name,self
-        if prop.name in ('matrix','x','y'):
-            for cx in self.cx:
-                for e in cx.registered: e.update_points()
+        for cx in self.cx:
+            for e in cx.registered: e.update_points()
 
     def resrc(self,code):
         self.code.props.text = code
