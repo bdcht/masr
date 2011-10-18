@@ -41,7 +41,7 @@ class  Canvas(GooCanvas):
         self.connect("event",Canvas.eventhandler)
 
     def eventhandler(self,e):
-        print e.type
+        #print e.type
         if e.type == gtk.gdk.KEY_PRESS:
             kvn = gtk.gdk.keyval_name(e.keyval)
             if kvn == 'a':
