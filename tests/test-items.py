@@ -8,7 +8,6 @@ from masr.plugins.graph.items import *
 
 def scene(app):
     # test drawing on canvas:
-    print 'make ellipse'
     el = Ellipse(parent=app.screen.canvas.root,
                  center_x=400,center_y=200,
                  radius_x=50,radius_y=40,
@@ -26,10 +25,12 @@ def scene(app):
     app.screen.canvas.root.add_child(n2)
     e = Edge_basic(n1,n2,head=False)
     app.screen.canvas.root.add_child(e)
-    #e = Edge_curve(n1,n2)
-    #e.props.stroke_color='DarkGreen'
-    #self.screen.canvas.root.add_child(e)
-    #e.update_points()
+    e = Edge_curve(n1,n2)
+    e.set_properties(stroke_color='DarkGreen')
+    app.screen.canvas.root.add_child(e)
+    e.splines[0].insert(1,(251,10))
+    e.splines[0].insert(2,(300,40))
+    e.update_points()
 
 app=Masr()
 app.run(start=scene)

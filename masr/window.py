@@ -80,5 +80,6 @@ class gtkWindow(Window):
     def mainLoop(self):
         # create the gtk window and everything in it:
         self.window.show_all()
+        self.window.set_focus(self.canvas)
         # let gtk handle the event loop:
         gtk.main()

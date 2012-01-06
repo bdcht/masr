@@ -75,7 +75,7 @@ def ast2Graph(ast):
     v2 = V[edot.n2.name]
     e = Edge(v1,v2)
     e.view = Edge_basic(v1.view,v2.view,head=True)
-    e.view.props.line_width = 2
+    e.view.set_properties(line_width = 2)
     E.append(e)
   return Graph(V.values(),E)
 
@@ -97,8 +97,6 @@ class Node(Node_codeblock):
     return (self.props.x,self.props.y)
   def set_xy(self,xy):
     self.props.x,self.props.y = xy
-    self.props.matrix = self.matrix
-    #self.cx.props.matrix = self.matrix
   xy = property(get_xy,set_xy)
 
 #------------------------------------------------------------------------------
@@ -108,34 +106,26 @@ class Node(Node_codeblock):
 class CGraph(SugiyamaLayout):
 
   def __init__(self,c,g):
-    #Blit.__init__(self,canvas=c,scale_factor=10,test_image=False)
     self.parent = c
-    #c.root.add(self)
     SugiyamaLayout.__init__(self,g)
     self.route_edge = route_with_lines
-    self.xspace,self.yspace = median_wh([v.view for v in g.V()])
+    self.dx,self.dy = 5,5
 
   def Draw(self,N=1):
-    gr = self.g
-    r = filter(lambda x: len(x.e_in())==0, gr.sV)
-    print "%d verts, %d root(s)"%(gr.order(),len(r))
-    print 'using tarjan algorithm to find inverted_edges...'
-    L = gr.get_scs_with_feedback(r)
-    self.init_all(roots=r,inverted_edges=filter(lambda x:x.feedback, gr.sE))
+    self.init_all()
     self.draw(N)
-    for e in self.alt_e: e.view.props.outline_color='red'
-    for v in gr.sV: self.connect_add(v.view)
-    for e in gr.sE:
-        self.parent.root.add(e.view)
-        # Blit case do: self.add(e.view)
-        #self.parent.root.set_z(e.view,1)
+    for e in self.alt_e: e.view.set_properties(stroke_color='red')
+    for v in self.g.sV: self.connect_add(v.view)
+    for e in self.g.sE:
+        self.parent.root.add_child(e.view)
         # move edge start/end to CX points:
         e.view.update_points()
 
   def connect_add(self,item):
-    item.connect_object_after("event",CGraph.eventhandler,self,item)
-    self.parent.root.add(item)
-    # Blit case do: self.add(item)
+    item.connect_object_after("button-press-event",CGraph.eventhandler,self,item)
+    item.connect_object_after("button-release-event",CGraph.eventhandler,self,item)
+    item.connect_object_after("motion-notify-event",CGraph.eventhandler,self,item)
+    self.parent.root.add_child(item)
 
   def disconnect(self,item):
     item.disconnect_by_func(CGraph.eventhandler)
@@ -154,7 +144,8 @@ class CGraph(SugiyamaLayout):
       self.c.root.remove(v.view)
 
   # Scene-Wide (default) event handler on items events:
-  def eventhandler(self,e,cr,pick_item,obj):
+  def eventhandler(self,*args):
+    cr,e,obj = args
     self.selected=obj
     if e.type == gtk.gdk.KEY_PRESS:
       if e.keyval == ord('p'):
@@ -167,6 +158,6 @@ class CGraph(SugiyamaLayout):
           mvmt=self.drawer.next()
           for x in mvmt:
             if hasattr(x.view,'shadbox'):
-              x.view.shadbox.props.fill_color='green'
+              x.view.shadbox.set_properties(fill_color='green')
         except AttributeError:
           self.drawer=self.draw_step()

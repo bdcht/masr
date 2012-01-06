@@ -132,6 +132,7 @@ class Node_basic(Group):
         # clicked: 1=mouse1, 2=mouse2, 3=mouse3
         self.clicked=0
         self.connect('notify::transform',Node_basic.notifyhandler)
+        self.raise_(None)
 
     @mouse1moves
     def eventhandler(self,item,e):
@@ -159,10 +160,12 @@ class Edge_basic(Polyline):
         self.set_properties(close_path=False,
                             stroke_color='black',
                             end_arrow=True,
+                            fill_pattern=None,
                             line_width=2)
         if head:
             self.set_properties(end_arrow=True)
         self.update_points()
+        self.lower(None)
         self.clicked=0
 
     def setpath(self,l):
@@ -172,7 +175,7 @@ class Edge_basic(Polyline):
         pts = self.props.points.coords
         self.n[0].intersect(topt=pts[1],cx=self.cx[0])
         self.n[1].intersect(topt=pts[-2],cx=self.cx[-1])
-        self.cx[-1].props.fill_color='blue'
+        self.cx[-1].set_properties(fill_color='blue')
         cx = self.cx[0].getpos()
         pts[0] = cx
         cx = self.cx[-1].getpos()
@@ -189,15 +192,17 @@ class Edge_curve(Path):
         n0.cx.append(self.cx[0]); n0.add_child(self.cx[0])
         n1.cx.append(self.cx[1]); n1.add_child(self.cx[1])
         Path.__init__(self)
-        self.props.stroke_color = 'black'
-        self.props.line_width = 1
-        self.props.line_cap = 1
-        self.props.line_join = 1
+        self.set_properties(stroke_color = 'black',
+                            fill_pattern=None,
+                            line_width = 2,
+                            line_cap = 1,
+                            line_join = 1)
         self.splines = [[(n0.props.x,n0.props.y),(n1.props.x,n1.props.y)]]
         self.update_points()
+        self.lower(None)
         self.clicked=0
 
-    def write_data(self):
+    def make_data(self):
         p0 = self.splines[0][0]
         data = "M %d %d"%p0
         for s in self.splines:
@@ -207,8 +212,17 @@ class Edge_curve(Path):
                 data += " C %d %d"%s[1]
                 data += " %d %d"%s[2]+" %d %d"%s[3]
         if self.has_head:
-            pass
-        self.props.data = data
+            s=self.splines[-1]
+            p = s[-1]
+            dx = p[0]-s[-2][0]
+            dy = p[1]-s[-2][1]
+            l  = math.sqrt(dx*dx+dy*dy)
+            dx,dy = dx/l*6,dy/l*6
+            data += " l %d %d"%(-dx-dy,-dy+dx)
+            data += " M %d %d"%p
+            data += " l %d %d"%(-dx+dy,-dy-dx)
+            data += " M %d %d"%p
+        return data
 
     def setpath(self,l):
         try:
@@ -220,13 +234,14 @@ class Edge_curve(Path):
         try:
             spl0 = self.splines[0]
             spl1 = self.splines[-1]
-            self.n[0].intersect(topt=spl0[1],cx=self.cx[0])
-            self.n[1].intersect(topt=spl1[-2],cx=self.cx[1])
-            cx = (self.cx[0].props.x,self.cx[0].props.y)
+            # move CX to intersection between edge and Node border:
+            self.n[0].intersect(topt=spl0[-1],cx=self.cx[0])
+            self.n[1].intersect(topt=spl1[0],cx=self.cx[1])
+            cx = self.cx[0].getpos()
             spl0[0] = cx
-            cx = (self.cx[1].props.x,self.cx[1].props.y)
+            cx = self.cx[1].getpos()
             spl1[-1] = cx
-            self.write_data()
+            self.set_properties(data=self.make_data())
         except:
             pass
 

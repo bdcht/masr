@@ -16,9 +16,10 @@ class  Canvas(GooCanvas):
 
     def __init__(self,**args):
         GooCanvas.__init__(self,**args)
-        self.scroll_to(0,0)
         # infinite world should replace scroll_region
-        self.props.automatic_bounds=True
+        self.set_properties(automatic_bounds=True,
+                            bounds_from_origin=False,
+                            bounds_padding=100)
 
         self.root = self.get_root_item()
         self.root.set_properties(fill_color='white')
@@ -50,7 +51,6 @@ class  Canvas(GooCanvas):
             #    self.grid()
             if kvn == 'Control_L':
                 if not self.zoom:
-                    print 'zoom on'
                     self.zoom = True
             elif kvn == 'plus' and self.zoom:
                 self.props.scale *= 1.2
@@ -59,7 +59,6 @@ class  Canvas(GooCanvas):
             return False
         elif e.type == gtk.gdk.KEY_RELEASE:
             if gtk.gdk.keyval_name(e.keyval) == 'Control_L':
-                print 'zoom off'
                 self.zoom = False
                 return True
         elif e.type == gtk.gdk.SCROLL and self.zoom:
