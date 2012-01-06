@@ -19,10 +19,10 @@ masr - 0.1
 * Description
 
 masr is a gtk cairo framework based on
-  [[http://geocanvas.sourceforge.net/crcanvas][crcanvas]].
+  [[http://live.gnome.org/GooCanvas][GooCanvas]].
 It provides a GUI application template class (Masr) with:
   - a menu bar
-  - the main drawing canvas (a crcanvas widget)
+  - the main drawing canvas (a Canvas widget)
   - a status bar
   - a dbus server
 It provides also a dbus-based python client that allows a complete remote
@@ -54,7 +54,7 @@ D-bus and control the entire app :
    >>> app.screen
    <masr.window.gtkWindow object at 0x8d6f20c>
    >>> app.screen.canvas
-   <Canvas object at 0x8d7175c (CrCanvas at 0x8df6040)>
+   <Canvas object at 0x8d7175c (GooCanvas at 0x8df6040)>
   #+END_EXAMPLE
 
 
@@ -91,15 +91,15 @@ Event handlers are supposed to be set up in start() or during plugins init.
 ** =masr/gui.py= : contains the menubar and statusbar gtk widget definition.
    - gtkgui
 
-** =masr/canvas.py= : contains the crcanvas wrapper. The current underlying canvas
-is [[http://geocanvas.sourceforge.net/crcanvas][crcanvas]], but a branch based on
-   [[http://live.gnome.org/GooCanvas][goocanvas]] is planned.
-   - CrCanvas
+** =masr/canvas.py= : contains the Canvas wrapper. This branch of masr relies
+   on the [[http://live.gnome.org/PyGoocanvas][pygoocanvas]] python wrapper
+   (simply do apt-get install python-pygoocanvas).
+   This library allows for interesting export to various formats.
+   - Canvas
 
-*** CrCanvas
-The canvas region is setup as an infinite scrolling area. It is equiped with a
-'Panner' allowing to navigate with mouse movements, and a 'Zoomer' providing
-canvas scaling (with default factor limits x0.0125 and x16).
+*** GooCanvas
+The canvas region is setup as an infinite scrolling area.
+A 'Zoomer' provides canvas scaling through Ctrl-[+-] or Ctrl-mouse-scroll.
 
 ** =masr/serv.py= : contains the dbus 'server' socket and associated methods.
 
