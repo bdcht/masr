@@ -319,7 +319,7 @@ class Node_codeblock(Group):
                     }
         lre = re.compile("(0x[0-9a-f]+ )('[0-9a-f]+' +)(.*)$")
         hcode = []
-        for l in self.code.get_properties('text').splitlines():
+        for l in self.code.get_properties('text')[0].splitlines():
             if l.startswith('#'):
                 hcode.append(style['comm']%l)
             else:

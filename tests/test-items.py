@@ -22,6 +22,7 @@ def scene(app):
     n2 = Node_codeblock("0x0804843c 'f3a4'    rep movsb dword [esp+0x4],0x3\n"
                         "0x0804835e '8945fc'  mov [ebp-0x4],eax")
     n2.set_properties(x=351,y=51)
+    n2.highlight_on()
     app.screen.canvas.root.add_child(n2)
     e = Edge_basic(n1,n2,head=False)
     app.screen.canvas.root.add_child(e)
