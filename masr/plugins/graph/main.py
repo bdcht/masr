@@ -81,23 +81,9 @@ def ast2Graph(ast):
 
 def dotnode(seq):
   _start = Vertex(seq)
-  _start.view = Node(_start)
+  v = _start.view = Node_codeblock(_start.data.replace('\l','\n'))
+  v.w,v.h = v.get_wh()
   return _start
-
-#------------------------------------------------------------------------------
-# SceneBasic is a VertexViewer for Graph and a Node_basic for the canvas:
-class Node(Node_codeblock):
-  def __init__(self,o):
-    self.o = o
-    label = o.data
-    Node_codeblock.__init__(self,label.replace('\l','\n'))
-    self.w,self.h = self.get_wh()
-
-  def get_xy(self):
-    return (self.props.x,self.props.y)
-  def set_xy(self,xy):
-    self.props.x,self.props.y = xy
-  xy = property(get_xy,set_xy)
 
 #------------------------------------------------------------------------------
 # CGraph is simply a SugiyamaLayout extended with adding nodes and edges views

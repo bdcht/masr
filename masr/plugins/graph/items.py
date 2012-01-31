@@ -34,6 +34,11 @@ class CX(Rect):
         bb = self.get_bounds()
         return (bb.x1,bb.y1)
 
+    def getcenter(self):
+        xy = self.getpos()
+        wh = self.get_wh()
+        return (xy[0]+wh[0]/2.,xy[1]+wh[1]/2.)
+
     # manage Edge_basic that are using this CX:
     def register(self,item):
         self.registered.append(item)
@@ -82,6 +87,12 @@ class Node_basic(Group):
         bb = self.get_bounds()
         return (bb.x2-bb.x1,bb.y2-bb.y1)
     wh = property(get_wh,set_wh)
+
+    def set_xy(self,xy):
+        self.props.x,self.props.y = xy
+    def get_xy(self):
+        return (self.props.x,self.props.y)
+    xy = property(get_xy,set_xy)
 
     # put the cx pt at the intersection between the circle shape of Node_basic
     # and the radius from centre to pt 'topt'. 
@@ -151,8 +162,8 @@ class Node_basic(Group):
 class Edge_basic(Polyline):
     def __init__(self,n0,n1,head=False):
         self.n = [n0,n1]
-        x0,y0 = n0.props.x,n0.props.y
-        x1,y1 = n1.props.x,n1.props.y
+        x0,y0 = n0.xy
+        x1,y1 = n1.xy
         self.cx = [CX(self),CX(self)]
         n0.cx.append(self.cx[0]); n0.add_child(self.cx[0])
         n1.cx.append(self.cx[1]); n1.add_child(self.cx[1])
@@ -176,9 +187,9 @@ class Edge_basic(Polyline):
         self.n[0].intersect(topt=pts[1],cx=self.cx[0])
         self.n[1].intersect(topt=pts[-2],cx=self.cx[-1])
         self.cx[-1].set_properties(fill_color='blue')
-        cx = self.cx[0].getpos()
+        cx = self.cx[0].getcenter()
         pts[0] = cx
-        cx = self.cx[-1].getpos()
+        cx = self.cx[-1].getcenter()
         pts[-1] =  cx
         self.props.points = Points(pts)
 
@@ -197,7 +208,7 @@ class Edge_curve(Path):
                             line_width = 2,
                             line_cap = 1,
                             line_join = 1)
-        self.splines = [[(n0.props.x,n0.props.y),(n1.props.x,n1.props.y)]]
+        self.splines = [[n0.xy,n1.xy]]
         self.update_points()
         self.lower(None)
         self.clicked=0
@@ -237,9 +248,9 @@ class Edge_curve(Path):
             # move CX to intersection between edge and Node border:
             self.n[0].intersect(topt=spl0[-1],cx=self.cx[0])
             self.n[1].intersect(topt=spl1[0],cx=self.cx[1])
-            cx = self.cx[0].getpos()
+            cx = self.cx[0].getcenter()
             spl0[0] = cx
-            cx = self.cx[1].getpos()
+            cx = self.cx[1].getcenter()
             spl1[-1] = cx
             self.set_properties(data=self.make_data())
         except:
@@ -266,13 +277,13 @@ class Node_codeblock(Group):
                                     line_width=1)
         self.code.raise_(self.codebox)
         # shadow :
-        self.shadow = s = 2
-        self.codebox.set_properties(x=-s,y=-s)
-        self.code.set_properties(x=-s+self.padding,y=-s+self.padding)
+        self.shadow = s = 4
+        #self.codebox.set_properties(x=-s,y=-s)
+        self.code.set_properties(x=self.padding,y=self.padding)
         self.shadbox = Rect(x=s,y=s,width=w,height=h,
                             fill_color='grey44',
                             line_width=0)
-        self._wh = (w+s+s,h+s+s)
+        self._wh = (w+s,h+s)
         self.cx = []
         self.add_child(self.shadbox,0)
         self.shadbox.lower(self.codebox)
@@ -290,11 +301,19 @@ class Node_codeblock(Group):
         return self._wh
     wh = property(get_wh,set_wh)
 
+    # xy property is bound to center of object
+    def get_xy(self):
+        w,h = self.codebox.get_properties('width','height')
+        return (self.props.x+w/2,self.props.y+h/2)
+    def set_xy(self,xy):
+        self.props.x,self.props.y = xy[0]-self.w/2.,xy[1]-self.h/2.
+    xy = property(get_xy,set_xy)
+
     def intersect(self,topt,cx):
         assert self.find_child(cx)!=-1
         bb = self.get_bounds()
         w,h = self.codebox.get_properties('width','height')
-        x1,y1 = w/2,h/2
+        x1,y1 =  (w/2.,h/2.)
         x2,y2 = topt[0]-bb.x1,topt[1]-bb.y1
         # now try all 4 segments of self rectangle:
         S = [((x1,y1),(x2,y2),(0,0),(w,0)),
@@ -304,7 +323,7 @@ class Node_codeblock(Group):
         for segs in S:
             xy = intersect2lines(*segs)
             if xy!=None:
-                cx.set_properties(x=xy[0]-self.shadow,y=xy[1]-self.shadow)
+                cx.set_properties(x=xy[0],y=xy[1])
                 break
 
     def highlight_on(self,style=None):
