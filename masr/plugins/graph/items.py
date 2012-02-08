@@ -260,12 +260,13 @@ class Edge_curve(Path):
 class Node_codeblock(Group):
 
     def __init__(self,code):
-        Group.__init__(self)
+        Group.__init__(self,can_focus=True)
         self.codebox = Rect(parent=self,can_focus=True)
         self.code = Text(parent=self,
                          text=code,
                          font='monospace, 10',
                          use_markup=True,
+                         can_focus=True,
                          fill_color='black')
         self.padding = 4
         bbink,bblogic = self.code.get_natural_extents()
@@ -293,6 +294,8 @@ class Node_codeblock(Group):
         self.connect("leave-notify-event",Node_codeblock.eventhandler)
         self.connect("button-press-event",Node_codeblock.eventhandler)
         self.connect("button-release-event",Node_codeblock.eventhandler)
+        self.connect("key-press-event",Node_codeblock.eventhandler)
+        self.connect("key-release-event",Node_codeblock.eventhandler)
         self.connect("motion-notify-event",Node_codeblock.eventhandler)
         self.connect('notify::transform',Node_codeblock.notifyhandler)
 
@@ -364,6 +367,7 @@ class Node_codeblock(Group):
 
     @mouse1moves
     def eventhandler(self,item,e):
+        #print "*** CODEBLOCK EVENT =",e
         if e.type is gtk.gdk.ENTER_NOTIFY:
             self.codebox.set_properties(line_width=2.0)
         elif e.type is gtk.gdk.LEAVE_NOTIFY:
