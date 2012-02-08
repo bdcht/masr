@@ -4,7 +4,7 @@
 # published under GPLv2 license
 
 from  goocanvas import Canvas as GooCanvas
-from  goocanvas import polyline_new_line,Grid
+from  goocanvas import polyline_new_line,Grid,LineDash
 from  goocanvas import ITEM_VISIBLE,ITEM_INVISIBLE
 import gtk
 
@@ -28,10 +28,6 @@ class  Canvas(GooCanvas):
         polyline_new_line(self.root,0,-5,0,5,stroke_color='red')
 
         self.zoom = False
-        self.pan  = False
-        self._grid = None
-        if args.has_key('grid'):
-            self.grid(*(args['grid']))
 
         # GooCanvas will transmit all keyboard events to
         # its parent unless one of its item has focus.
@@ -42,13 +38,10 @@ class  Canvas(GooCanvas):
         self.connect("event",Canvas.eventhandler)
 
     def eventhandler(self,e):
-        #print e.type
         if e.type == gtk.gdk.KEY_PRESS:
             kvn = gtk.gdk.keyval_name(e.keyval)
             if kvn == 'a':
                 self.scroll_to(0,0)
-            #elif kvn=='g':
-            #    self.grid()
             if kvn == 'Control_L':
                 if not self.zoom:
                     self.zoom = True
@@ -70,32 +63,4 @@ class  Canvas(GooCanvas):
         elif e.type == gtk.gdk.BUTTON_PRESS:
             print "click:(%d,%d)"%e.get_coords()
         return False
-
-    def grid(self,dx=100,dy=100):
-        if self._grid!=None:
-            if self._grid.is_visible():
-                self._grid.props.visibility = ITEM_INVISIBLE
-            else:
-                self._grid.props.visibility = ITEM_VISIBLE
-        else:
-            self._grid=Grid(parent=self.root,
-                    x=0,y=0,width=2000,height=2000,
-                    x_step=dx,y_step=dy,
-                    line_width=1,
-                    stroke_color='gray66')
-
-
-    # textures are shared by all engine objects with a classmethod :
-    @classmethod
-    def loadTexture(Canvas, path):
-        if Canvas.textures.has_key(path) :
-            surface = Canvas.textures[path]
-        else:
-            surface = self.image_load(path)
-            Canvas.textures[path] = surface
-        return surface
-
-    # engine dependent method, should be overwritten:
-    def image_load(self,path):
-            raise NotImplementedError
 
