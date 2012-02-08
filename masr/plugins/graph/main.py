@@ -23,6 +23,8 @@ def start(pfunc,app,**kargs):
   app.screen.gui.message("plugin graph started by %s"%pfunc)
   al = kargs['args']
   sg = comp = 0
+  step = False
+  N=1
   for i,arg in enumerate(al):
     if arg.endswith(Session.filetype):
         if not app.session:
@@ -31,12 +33,16 @@ def start(pfunc,app,**kargs):
       sg = int(al[i+1])
     if arg == '-c':
       comp = int(al[i+1])
+    if arg == '-s':
+      step = True
+    if arg == '-N':
+      N = int(al[i+1])
   if app.session:
     assert sg<len(app.session.L)
     app.session.g = ast2Graph(app.session.L[sg])
     assert comp<len(app.session.g.C)
     app.session.cg = CGraph(app.screen.canvas,app.session.g.C[comp])
-    app.session.cg.Draw(1)
+    app.session.cg.Draw(N,stepflag=step)
 
 def end(pfunc,app,**kargs):
   pass
@@ -96,10 +102,19 @@ class CGraph(SugiyamaLayout):
     SugiyamaLayout.__init__(self,g)
     self.route_edge = route_with_lines
     self.dx,self.dy = 5,5
+    self.dirvh=0
+    c.parent.connect_object("button-press-event",CGraph.eventhandler,self)
+    c.parent.connect_object("button-release-event",CGraph.eventhandler,self)
+    c.parent.connect_object("key-press-event",CGraph.eventhandler,self)
+    c.parent.connect_object("key-release-event",CGraph.eventhandler,self)
 
-  def Draw(self,N=1):
+  def Draw(self,N=1,stepflag=False):
     self.init_all()
-    self.draw(N)
+    if stepflag:
+        self.drawer=self.draw_step()
+        self.greens=[]
+    else:
+        self.draw(N)
     for e in self.alt_e: e.view.set_properties(stroke_color='red')
     for v in self.g.sV: self.connect_add(v.view)
     for e in self.g.sE:
@@ -108,13 +123,10 @@ class CGraph(SugiyamaLayout):
         e.view.update_points()
 
   def connect_add(self,item):
-    item.connect_object_after("button-press-event",CGraph.eventhandler,self,item)
-    item.connect_object_after("button-release-event",CGraph.eventhandler,self,item)
-    item.connect_object_after("motion-notify-event",CGraph.eventhandler,self,item)
     self.parent.root.add_child(item)
 
-  def disconnect(self,item):
-    item.disconnect_by_func(CGraph.eventhandler)
+  def disconnect(self):
+    self.parent.parent.disconnect_by_func(CGraph.eventhandler)
 
   def remove(self,item):
     #import gc
@@ -130,20 +142,30 @@ class CGraph(SugiyamaLayout):
       self.c.root.remove(v.view)
 
   # Scene-Wide (default) event handler on items events:
-  def eventhandler(self,*args):
-    cr,e,obj = args
-    self.selected=obj
+  def eventhandler(self,e):
     if e.type == gtk.gdk.KEY_PRESS:
       if e.keyval == ord('p'):
         for l in self.layers:
           for v in l:
-            v.view.xy = (self.grx[v].x[self.x],v.view.xy[1])
+            v.view.xy = (self.grx[v].x[self.dirvh],v.view.xy[1])
         self.draw_edges()
+        self.dirvh = (self.dirvh+1)%4
       if e.keyval == ord(' '):
         try:
-          mvmt=self.drawer.next()
+          s,mvmt = self.drawer.next()
+          print s,len(mvmt)
+          for x in self.greens:
+              x.view.shadbox.set_properties(fill_color='grey44')
+          self.greens=[]
           for x in mvmt:
             if hasattr(x.view,'shadbox'):
               x.view.shadbox.set_properties(fill_color='green')
+              self.greens.append(x)
+        except StopIteration:
+            print 'drawer terminated'
+            del self.drawer
+            del self.greens
         except AttributeError:
-          self.drawer=self.draw_step()
+            print 'drawer created'
+            self.drawer=self.draw_step()
+            self.greens=[]
