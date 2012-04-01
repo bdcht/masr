@@ -105,8 +105,8 @@ class Node_basic(Group):
         # intersect with target pt:
         x2,y2 = topt
         theta = math.atan2(y2-y1,x2-x1)
-        newx = int(math.cos(theta)*self._r)
-        newy = int(math.sin(theta)*self._r)
+        newx = math.cos(theta)*self._r
+        newy = math.sin(theta)*self._r
         cx.set_properties(x=newx,y=newy)
         self._angle = theta
 
@@ -279,7 +279,6 @@ class Node_codeblock(Group):
         self.code.raise_(self.codebox)
         # shadow :
         self.shadow = s = 4
-        #self.codebox.set_properties(x=-s,y=-s)
         self.code.set_properties(x=self.padding,y=self.padding)
         self.shadbox = Rect(x=s,y=s,width=w,height=h,
                             fill_color='grey44',
@@ -307,9 +306,10 @@ class Node_codeblock(Group):
     # xy property is bound to center of object
     def get_xy(self):
         w,h = self.codebox.get_properties('width','height')
-        return (self.props.x+w/2,self.props.y+h/2)
+        return (self.props.x+w/2.,self.props.y+h/2.)
     def set_xy(self,xy):
-        self.props.x,self.props.y = xy[0]-self.w/2.,xy[1]-self.h/2.
+        w,h = self.codebox.get_properties('width','height')
+        self.props.x,self.props.y = xy[0]-w/2.,xy[1]-h/2.
     xy = property(get_xy,set_xy)
 
     def intersect(self,topt,cx):

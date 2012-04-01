@@ -18,6 +18,7 @@ class  Canvas(GooCanvas):
         GooCanvas.__init__(self,**args)
         # infinite world should replace scroll_region
         self.set_properties(automatic_bounds=True,
+                            integer_layout=False,
                             bounds_from_origin=False,
                             bounds_padding=100)
 

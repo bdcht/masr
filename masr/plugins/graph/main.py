@@ -71,7 +71,7 @@ def ast2Graph(ast):
       label = x.attr['label']
     except (KeyError,AttributeError):
       label = x.name
-    v = dotnode(label)
+    v = dotnode(label.strip('"\n'))
     V[x.name] = v
   edgelist = []
   # create Edge and Edge_basic for each edge in ast:
