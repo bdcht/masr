@@ -180,11 +180,10 @@ def Zoom(action,app):
     elif action == 'ZoomOut': canvas.zoom(.8,.8)
     elif action == 'ZoomFit': canvas.zoom_world()
     elif action == 'Zoom100':
-        m = canvas.root.matrix
-        coef_x,coef_y = m.transform_distance(1,1)
-        canvas.zoom(1./coef_x,1./coef_y)
-    elif action == 'Zoomer':
-        canvas.zoomer.activate()
+        m = canvas.root.get_simple_transform()
+        # TODO: use cairo Matrix :
+        #coef_x,coef_y = m.transform_distance(1,1)
+        #canvas.zoom(1./coef_x,1./coef_y)
 
 #------------------------------------------------------------------------------
 
