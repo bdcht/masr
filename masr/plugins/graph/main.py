@@ -24,6 +24,7 @@ def start(pfunc,app,**kargs):
   al = kargs['args']
   sg = comp = 0
   step = False
+  cons = False
   N=1
   for i,arg in enumerate(al):
     if arg.endswith(Session.filetype):
@@ -37,12 +38,14 @@ def start(pfunc,app,**kargs):
       step = True
     if arg == '-N':
       N = int(al[i+1])
+    if arg == '-ce':
+      cons=True
   if app.session:
     assert sg<len(app.session.L)
     app.session.g = ast2Graph(app.session.L[sg])
     assert comp<len(app.session.g.C)
     app.session.cg = CGraph(app.screen.canvas,app.session.g.C[comp])
-    app.session.cg.Draw(N,stepflag=step)
+    app.session.cg.Draw(N,stepflag=step,constrained=cons)
 
 def end(pfunc,app,**kargs):
   pass
@@ -108,8 +111,8 @@ class CGraph(SugiyamaLayout):
     c.parent.connect_object("key-press-event",CGraph.eventhandler,self)
     c.parent.connect_object("key-release-event",CGraph.eventhandler,self)
 
-  def Draw(self,N=1,stepflag=False):
-    self.init_all()
+  def Draw(self,N=1,stepflag=False,constrained=False):
+    self.init_all(cons=constrained)
     if stepflag:
         self.drawer=self.draw_step()
         self.greens=[]
