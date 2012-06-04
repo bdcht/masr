@@ -35,6 +35,21 @@ The code dedicated to graph drawing is found in the plugins/graph directory.
 Coordinates of nodes and edge routing points are computed by grandalf and
 node/edge views (gtk widgets on the canvas) are managed by the plugin.
 
+* Installation
+
+masr depends on /pygtk/, /numpy/, /dbus/ and /goocanvas/.
+Most _Linux_ distributions have packages for these dependencies (python-numpy,
+python-dbus, python-pygoocanvas, python-gtk2, ...) so the installation is
+straightforward for Linux platform.
+
+For _Windows_, you will obviously need to install gtk/pygtk libraries from
+[[http://www.pygtk.org/dowloads.html][here]].
+I've used /pygtk-all-in-one-2.24.2.win32-py2.7.msi/ installer
+(which provides goocanvas support as well). The numpy installer is found
+[[http://pypi.python.org/pypi/numpy][here]].
+I have tested grandalf/masr on Windows XP SP3 with Python 2.7.
+
+
 * Quickstart
 
 The "raw naked" Masr template class provides a window equiped with some gtk

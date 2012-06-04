@@ -25,8 +25,10 @@ class Window(object):
 import pygtk
 pygtk.require('2.0')
 import gtk
+import os
 
-gtk.gdk.threads_init()
+if os.name=='posix':
+    gtk.gdk.threads_init()
 
 class gtkWindow(Window):
     """ pygtk based window, extending Window class
