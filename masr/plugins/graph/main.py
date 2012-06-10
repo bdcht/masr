@@ -6,9 +6,7 @@
 
 
 
-import pygtk
 import gtk
-import gobject
 
 from grandalf.graphs import Vertex,Edge,Graph
 from grandalf.layouts import SugiyamaLayout
@@ -97,7 +95,6 @@ def dotnode(seq):
 #------------------------------------------------------------------------------
 # CGraph is simply a SugiyamaLayout extended with adding nodes and edges views
 # on the current canvas and dealing with mouse/keyboard events.
-# FIXME: should inherit from Blit rather than Item but this leads to segfault
 class CGraph(SugiyamaLayout):
 
   def __init__(self,c,g):
@@ -153,6 +150,22 @@ class CGraph(SugiyamaLayout):
             v.view.xy = (self.grx[v].x[self.dirvh],v.view.xy[1])
         self.draw_edges()
         self.dirvh = (self.dirvh+1)%4
+      if e.keyval == ord('W'):
+          self.xspace += 1
+          self.setxy()
+          self.draw_edges()
+      if e.keyval == ord('w'):
+          self.xspace -= 1
+          self.setxy()
+          self.draw_edges()
+      if e.keyval == ord('H'):
+          self.yspace += 1
+          self.setxy()
+          self.draw_edges()
+      if e.keyval == ord('h'):
+          self.yspace -= 1
+          self.setxy()
+          self.draw_edges()
       if e.keyval == ord(' '):
         try:
           s,mvmt = self.drawer.next()
