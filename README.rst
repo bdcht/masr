@@ -50,7 +50,7 @@ Quickstart
 The "raw naked" Masr template class provides a window equiped with some gtk
 widgets (menu,statusbar,crcanvas,etc). Simply do:
 
-.. pygments:: python
+.. sourcecode:: python
 
    >>> from masr import Masr
    >>> a = Masr()
@@ -59,7 +59,7 @@ widgets (menu,statusbar,crcanvas,etc). Simply do:
 Then we can use the masrdbc script to "connect" to the Masr instance through
 D-bus and control the entire app :
 
-.. pygments:: python
+.. sourcecode:: python
 
    $ masrdbc
    Welcome to masr d-bus client.
@@ -90,7 +90,7 @@ The run() method of Masr will also setup all loaded plugins (modules).
 Such plugin is loaded if it appears in the Masr.plugins list.
 The default usage is:
 
-.. pygments:: python
+.. sourcecode:: python
    >>> a=Masr()
    >>> a.run()
 
