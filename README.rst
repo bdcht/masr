@@ -12,13 +12,13 @@ Masr-"a simple gtk/cairo canvas gui"
 
 Description
 ===========
-
 masr is a gtk cairo framework based on GooCanvas_.
 It provides a GUI application template class (Masr) with:
-  - a menu bar
-  - the main drawing canvas (a Canvas widget)
-  - a status bar
-  - a dbus server
+
+- a menu bar
+- the main drawing canvas (a Canvas widget)
+- a status bar
+- a dbus server
 
 It provides also a dbus-based python client that allows a complete remote
 control of the Masr application instance. New features can be developed as
@@ -31,8 +31,7 @@ node/edge views (gtk widgets on the canvas) are managed by the plugin.
 
 Installation
 ============
-
-masr depends on /pygtk/, /numpy/, /dbus/ and /goocanvas/.
+masr depends on *pygtk*, *numpy*, *dbus* and *goocanvas*.
 Most _Linux_ distributions have packages for these dependencies (python-numpy,
 python-dbus, python-pygoocanvas, python-gtk2, ...) so the installation is
 straightforward for Linux platform.
@@ -46,7 +45,6 @@ I have tested grandalf/masr on Windows XP SP3 with Python 2.7.
 
 Quickstart
 ==========
-
 The "raw naked" Masr template class provides a window equiped with some gtk
 widgets (menu,statusbar,crcanvas,etc). Simply do:
 
@@ -73,24 +71,26 @@ D-bus and control the entire app :
 
 *masr/main.py*
 --------------
+Contains the main class:
 
-contains the main class
-   - Masr
+- Masr
 
 Masr.
 ~~~~~
 This class is the base template for any GUI application. The main class may
 inherit from Masr, and redefine the 'start' and 'end' or 'step' methods.
-   - start() is called just before entering the GUI mainloop, so its a good
-     place to put everything needed to setup the scene,
-   - step() is called inside the mainloop,
-   - end() is called after the mainloop to clean up everything.
+
+- start() is called just before entering the GUI mainloop, so its a good
+  place to put everything needed to setup the scene,
+- step() is called inside the mainloop,
+- end() is called after the mainloop to clean up everything.
 
 The run() method of Masr will also setup all loaded plugins (modules).
 Such plugin is loaded if it appears in the Masr.plugins list.
 The default usage is:
 
 .. sourcecode:: python
+
    >>> a=Masr()
    >>> a.run()
 
@@ -99,10 +99,10 @@ crcanvas widget. (The graph plugin is loaded by default.)
 
 *masr/window.py*
 ----------------
+Contains the gtk window classes:
 
-contains the gtk window class
-   - Window
-   - gtkWindow(Window)
+- Window
+- gtkWindow(Window)
 
 gtkWindow.
 ~~~~~~~~~~
@@ -115,18 +115,18 @@ Event handlers are supposed to be set up in start() or during plugins init.
 
 *masr/gui.py*
 -------------
+Contains the menubar and statusbar gtk widget definition.
 
-contains the menubar and statusbar gtk widget definition.
-   - gtkgui
+- gtkgui
 
 *masr/canvas.py*
 ----------------
-
-contains the Canvas wrapper. This branch of masr relies
+Contains the Canvas wrapper. This branch of masr relies
 on the pygoocanvas_ python wrapper
 (simply do apt-get install python-pygoocanvas).
 This library allows for interesting export to various formats.
-   - Canvas
+
+- Canvas
 
 GooCanvas
 ~~~~~~~~~
@@ -135,11 +135,11 @@ A 'Zoomer' provides canvas scaling through Ctrl-[+-] or Ctrl-mouse-scroll.
 
 *masr/serv.py*
 --------------
-contains the dbus 'server' socket and associated methods.
+Contains the dbus 'server' socket and associated methods.
 
 *masrdbc*
 ---------
-contains the dbus 'client' python interactive console.
+Contains the dbus 'client' python interactive console.
 
 *masr/plugins/utils.py*
 -----------------------
