@@ -13,7 +13,7 @@ from grandalf.layouts import SugiyamaLayout
 from grandalf.routing import *
 from grandalf.utils import median_wh,Dot
 
-from items import *
+from .items import *
 
 # start is called when Masr is 'run', to modify GUI/Canvas elements
 # with plugin-specific menus, keybindings, canvas options, etc. 

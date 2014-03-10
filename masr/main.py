@@ -13,7 +13,7 @@ try:
 
 except ImportError: pass
 
-from plugins.utils import run_plugins
+from .plugins.utils import run_plugins
 
 #------------------------------------------------------------------------------
 class Masr(object):
@@ -39,7 +39,7 @@ class Masr(object):
         except AttributeError: pass
 
         # create the window:
-        from window import gtkWindow
+        from .window import gtkWindow
         self.screen = gtkWindow(self)
 
         # init window, engine, events, bind events etc...
@@ -47,7 +47,7 @@ class Masr(object):
 
     @run_plugins
     def run(self,**kargs):
-        from serv import MasrServ
+        from .serv import MasrServ
         serv = MasrServ(self.__dict__)
         # main loop with start/end hooks :
         self.start(kargs.get('start',None))
@@ -68,7 +68,7 @@ class Masr(object):
 #------------------------------------------------------------------------------
 if __name__=='__main__':
     import sys
-    import plugins.graph as graph
+    from .plugins import graph
     a=Masr()
     a.plugins.add(graph)
     a.run(args=sys.argv)

@@ -54,7 +54,7 @@ class gtkWindow(Window):
         self.initCanvas()
 
     def initGUI(self):
-        from gui import gtkgui
+        from .gui import gtkgui
         self.gui = gtkgui(self.app)
         self.vbox.pack_start(self.gui.menubar,0)
         self.vpan = gtk.VPaned()
@@ -62,7 +62,7 @@ class gtkWindow(Window):
         self.vbox.pack_end(self.gui.statusbar,0)
 
     def initCanvas(self):
-        from canvas import Canvas
+        from .canvas import Canvas
         # the canvas will be added to a scrollable window:
         scrolled_window = gtk.ScrolledWindow()
         scrolled_window.set_border_width(2)
